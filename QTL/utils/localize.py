@@ -7,7 +7,6 @@ import sys
 def prep_arrays(F, X, Y, loci, thresh, verbose):
     F_ori = F
     loci = np.array([e for e, i in enumerate(loci) if i])
-    print(np.max(np.abs(F_ori),axis=0))
     loci_sorted = np.argsort(-np.max(np.abs(F_ori),axis=0))
     numloci = np.sum(np.max(np.abs(F_ori),axis=0) > thresh)
     if verbose: print(f"subtracting out effects of {numloci} loci with effect size greater than {thresh} in some env")
