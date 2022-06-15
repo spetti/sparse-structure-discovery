@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import scipy
 import sys
 
-#subtract residuals of top loci (those with effect size at least 0.001 in some env)
+#subtract residuals of top loci (those with effect size at least thresh in some env)
 def prep_arrays(F, X, Y, loci, thresh, verbose):
     F_ori = F
     loci = np.array([e for e, i in enumerate(loci) if i])
