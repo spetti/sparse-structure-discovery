@@ -29,7 +29,7 @@ parser.add_argument("-load_F", "--load_F", dest = "F_in", default = None, help="
 
 # options with defaults
 parser.add_argument("-ct", "--correlation_threshold", dest = "ct", default = .99, help="include loci with maximum pearson correlation c", type = float)
-parser.add_argument("-lt1", "-round_1_localization_threshold", dest = "lt1", default = .001, help="only localize loci with magnitude at least lt1 for some phenotype", type = float)
+parser.add_argument("-lt1", "-round_1_localization_threshold", dest = "lt1", default = 0.0, help="only localize loci with magnitude at least lt1 for some phenotype", type = float)
 parser.add_argument("-lt2", "--round_2_localization_threshold", dest = "lt2", default = .003, help="only localize loci with magnitude at least lt2 for some phenotype", type = float)
 parser.add_argument("-v", action='store_true', help="verbose", default = False)
 parser.add_argument("-po", action='store_true', help="compute number of loci that remain with cc threshold",  default = False)
@@ -154,7 +154,11 @@ if args.sl2o==False:
     expanded_list = lc.localize_and_split(idx_filt, loci_filt, F_ori, X, Y, Ysub, loci, args.width, args.std, args.v)
     loci_to_keep = [False for _ in range(GT.shape[1])]
     for _ in expanded_list:
-        loci_to_keep[_] = True
+        try:
+            loci_to_keep[_] = True
+        except:
+            print(_, len(loci_to_keep), GT.shape[1])
+            raise ValueError("index issue found")
     np.save(open(args.output_prefix+f"/loci_kept_after_localization_round_1_cc_{args.ct}_lt1_{args.lt1}_width_{args.width}_std_{args.std}.npy", 'wb'), loci_to_keep)
     print(f"num of loci identified: {sum(loci_to_keep)}")
 

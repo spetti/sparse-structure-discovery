@@ -26,7 +26,6 @@ def compute_fbest_and_intervals(l, ls, F_ori, X, Y, Ysub, width, z, verbose):
     if verbose: print(f"processing locus {l}, {ls}")
     varX = np.std(X[:,ls])**2
     varYs = (np.nanstd(Y,axis=0)**2)
-
     ran = np.arange(max(0,ls - width), min(S,ls + width + 1),dtype=int)
     mus = np.nanmean(X[:,ran],axis=0)
     cov = ((X[:,ran] - mus).T)@(X[:,ran] - mus)/X.shape[0]
@@ -66,8 +65,7 @@ def compute_fbest_and_intervals(l, ls, F_ori, X, Y, Ysub, width, z, verbose):
 
         interval = lhs < rhs
         intervals[e] = interval
-        
-    return fbest, intervals
+    return ran, fbest, intervals
 
 
 # round 1 localization
@@ -77,7 +75,7 @@ def localize_and_split(idx_filt, loci_filt, F_ori, X, Y, Ysub, loci, width, z, v
     for ind in range(len(idx_filt)):
         l = idx_filt[ind]
         ls = loci_filt[ind]
-        fbest, intervals = compute_fbest_and_intervals(l, ls, F_ori, X, Y, Ysub, width,z, verbose)
+        ran, fbest, intervals = compute_fbest_and_intervals(l, ls, F_ori, X, Y, Ysub, width,z, verbose)
         r_fbest = np.copy(fbest)
         r_intervals = np.copy(intervals)
         tops = []
@@ -88,8 +86,8 @@ def localize_and_split(idx_filt, loci_filt, F_ori, X, Y, Ysub, loci, width, z, v
             r_intervals= r_intervals[keep,:]
             r_fbest= r_fbest[keep, :]
             tops.append(top) 
-        if verbose: print([ls +50-i for i in tops])
-        to_keep_all.append([ls +50-i for i in tops])
+        if verbose: print([ran[i] for i in tops])
+        to_keep_all.append([ran[i] for i in tops])
     all_loci = [i for j in to_keep_all for i in j]
     all_loci = np.sort(list(set(all_loci)))
     return all_loci
@@ -103,8 +101,7 @@ def compute_interval_intersections(idx_filt, loci_filt, F_ori, X, Y, Ysub, loci,
     for ind in range(num_to_localize):
         l = idx_filt[ind]
         ls = loci_filt[ind]
-        fbest, intervals = compute_fbest_and_intervals(l, ls, F_ori, X, Y, Ysub, width,z, verbose)
-       
+        ran, fbest, intervals = compute_fbest_and_intervals(l, ls, F_ori, X, Y, Ysub, width,z, verbose)
         sums = np.sum(intervals*np.abs(fbest), axis = 0) 
         top = np.argmax(sums)
         sets = []
@@ -115,7 +112,7 @@ def compute_interval_intersections(idx_filt, loci_filt, F_ori, X, Y, Ysub, loci,
         intersection = sets[0]
         for i in range(1, len(sets)):
             intersection = intersection.intersection(sets[i])
-        if verbose: print([i-50+ls for i in intersection])
-        loci_lists.append([i-50+ls for i in intersection])
+        if verbose: print([ran[i] for i in intersection])
+        loci_lists.append([ran[i] for i in intersection])
         loci_localized.append((l,ls))
     return loci_localized, loci_lists
