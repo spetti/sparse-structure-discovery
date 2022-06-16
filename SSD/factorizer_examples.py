@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
-
-
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
@@ -23,20 +20,13 @@ fo_seeds = [3,4,5] # loci rotation
 
 
 # lambda values
-#lamb1_range = np.linspace(1e-4,1e-2,20)
-#lamb2_range = np.linspace(1e-4,1.25,20)
-#lamb2_range = 10**(np.linspace(np.log10(1e-4),np.log10(1.5),25))
-#lamb1_range = 10**(np.linspace(np.log10(1e-4),np.log10(1e-2),25))
 lamb2_range = 10**(np.linspace(np.log10(1e-3),np.log10(1.5),25))
 lamb1_range = 10**(np.linspace(np.log10(1e-4),np.log10(1e-2),25))
 lamb1_fixed = [1e-4]
 lamb2_fixed = [1e-3]
 
 
-# ## Common functions
-
-# In[3]:
-
+## Common functions
 
 # pick which k to run the methods with
 def pick_k(F, thresh = .95, printout = True):
@@ -108,73 +98,10 @@ def run_factorizer(fcts, lamb1_range, lamb2_range, lamb1_fixed, lamb2_fixed, K, 
             fcts[key].factorize_regularized_range(K, lamb1_fixed, lamb2_range, verbose = printout) 
 
 
-# ## BBQ functions
-
-# In[4]:
-
-
-def get_pheno_from_file(filename,N): 
-    Y = np.genfromtxt(filename,skip_header = 1, skip_footer = 1, usecols = (1))
-    Y = Y[:N]
-    return Y
-
-def gather_l21_F_XY(file_g, file_f, file_c, file_m, path_to_pheno, envs, seed):
-    X = np.load(file_g)
-    loci = np.load(file_c)
-    map_ = np.load(file_m)
-    causal_loci = np.where(map_ == True)[0][loci]
-    np.random.seed(seed)
-    
-    # restrict to causal loci
-    X = X[:, causal_loci] ##The causal loci should have their true coordinates
-
-    # load phenotypes (fitness) in envs
-    Y = np.zeros((X.shape[0], len(envs)))
-    for _,env in enumerate(envs):
-        Y[:,_] = get_pheno_from_file(f"{path_to_pheno}pheno_data_{env}.txt", X.shape[0])
-
-    print("No. of genotypes: %d  " %Y.shape[0], "No. of loci: %d  " %X.shape[1], "No. of envs: %d  " %Y.shape[1])
-
-    # filter out genotypes with NaN fitness
-    filter_out_nan = Y==Y
-    filter_out_nan = np.sum(filter_out_nan, axis = -1 ) == len(envs)
-
-    Y = Y[filter_out_nan, :]
-    X = X[filter_out_nan, :]
-
-    filt = np.random.choice(len(X),size = int(0.9*len(X)), replace = False)
-    split = np.zeros(len(X),dtype=bool)
-    split[filt] = 1
-    Xtrain = X[split]
-    Ytrain = Y[split]
-    Xval = X[~split]
-    Yval = Y[~split]
-    
-    vfilt = np.random.choice(len(Xval),size = int(0.5*len(Xval)), replace = False)
-    vsplit = np.zeros(len(Xval),dtype=bool)
-    vsplit[vfilt] = 1
-    Xtest = Xval[vsplit]
-    Ytest = Yval[vsplit]
-    Xval = Xval[~vsplit]
-    Yval = Yval[~vsplit]
-
-    
-    F = np.load(file_f).T
-    return F, Xtrain, Ytrain, Xval, Yval, Xtest, Ytest, causal_loci, envs
-
-def filter_envs(remove_envs, F, Ytrain, Yval, envs):
-    if remove_envs is not None:
-        filt_envs = [e not in remove_envs for e in envs]
-    else:
-        filt_envs = np.ones(len(envs), dtype=bool)
-    return F[filt_envs], Ytrain[:,filt_envs],  Yval[:,filt_envs], envs[filt_envs]
-
 
 # # RUN FOR DATASETS
 
 # ## Synthetic data: independent
-
-# In[21]:
 
 if mode == 'syn_ind':
     E,L,K = 96,200, 6
@@ -197,9 +124,6 @@ if mode == 'syn_ind':
     fcts = {}
 
     label = 'syn_ind'
-
-
-    # In[22]:
 
 
     for pair in mw_pairs:
@@ -237,7 +161,6 @@ if mode == 'syn_ind':
 
 # ## Synthetic data: hub structure
 
-# In[14]:
 
 if mode == "syn_hub":
     L = 200
@@ -264,9 +187,6 @@ if mode == "syn_hub":
             mw_pairs.append((m, w))
 
     label = 'syn_hub'
-
-
-    # In[15]:
 
 
     for pair in mw_pairs:
@@ -304,24 +224,32 @@ if mode == "syn_hub":
 # In[5]:
 if mode == 'bbq':
 
-    envs=["4NQO","23C","25C","27C","30C","33C","35C","37C","cu","eth","gu","li","mann","mol","raff","sds","suloc","ynb"]
-    file_g = "../../BBQ_data/geno_data_bool_96000.npy"
-    file_m = "./results/BBQ/loci_kept_cc_0.99.npy"
-    seed = 0
-    path_to_pheno = "../../BBQ_data/"
+    results_dir = "../QTL/BBQ_results_6_14_lt1_0"
+    inloc = "../QTL/BBQ_data_processed"
+    cc= "0.99"
+    lt1 ="0.0"
+    lt2 = "0.003"
+    width = "50"
+    std = "2"
+    F = np.load(f"{results_dir}/second_F_cc_{cc}_lt1_{lt1}_width_{width}_std_{std}.npy")
+    L = np.load(f"{results_dir}/loci_kept_after_localization_round_1_cc_{cc}_lt1_{lt1}_width_{width}_std_{std}.npy")
+    causal_loci = np.where(L==True)[0]
+    Xtrain = np.load(f"{inloc}/geno_train.npy") [:,causal_loci] 
+    Ytrain = np.load(f"{inloc}/pheno_train.npy") 
+    Xtest = np.load(f"{inloc}/geno_test.npy")[:,causal_loci] 
+    Ytest = np.load(f"{inloc}/pheno_test.npy")
+    
+    non_zero_loci = np.where(np.sum(np.abs(F), axis=0))[0]
+    Xtrain = Xtrain[:, non_zero_loci]
+    Xtest = Xtest[:, non_zero_loci]
+    F = F[:, non_zero_loci]
+    causal_loci = causal_loci[non_zero_loci]
 
-    mt = "1.0001"
-    cc_list = ["0.96","0.93","0.9"]
-    mc_str = "_".join(cc_list)
-    print(mt, mc_str)
-    file_f = f"./results/BBQ/elim_coeffs_mt_{mt}_mc_{mc_str}_for_glm_cc_0.99_seed_0.npy"
-    file_c = f"./results/BBQ/elim_positions_mt_{mt}_mc_{mc_str}_for_glm_cc_0.99_seed_0.npy"
-    F, Xtrain, Ytrain, Xval, Yval, Xtest, Ytest, causal_loci, envs = gather_l21_F_XY(file_g, file_f, file_c, file_m, path_to_pheno, envs, 0)
 
-
-    # In[7]:
-
-
+    
+    envs=["ynb","suloc","raff","mol","27C","eth","30C","25C","sds","cu","33C","li","gu","23C","35C","mann","37C", "4NQO"]
+    envs= sorted(envs)
+    
     # intialize factorizer for data and rotated objects
     label = "BBQ"
     fcts = {}
@@ -329,7 +257,7 @@ if mode == 'bbq':
     # intial factorizer with F
     fct = factorizer()
     fct.subtract_means = False
-    fct.init_with_F_XY(F, Xtrain, Ytrain, Xval, Yval)
+    fct.init_with_F_XY(F, Xtrain, Ytrain, Xtest, Ytest)
     fct.loci_names = causal_loci
     fct.env_names = envs
     fcts[(label, None, None)] = fct
@@ -346,11 +274,61 @@ if mode == 'bbq':
 
     # save results as a pickle
     pickle.dump(fcts, open(f"{out_location}/{label}", "wb"))
+    
+if mode == 'bbq8':
 
+    results_dir = "../QTL/BBQ_results_6_14_lt1_0"
+    inloc = "../QTL/BBQ_data_processed"
+    cc= "0.99"
+    lt1 ="0.0"
+    lt2 = "0.003"
+    width = "50"
+    std = "2"
+    F = np.load(f"{results_dir}/second_F_cc_{cc}_lt1_{lt1}_width_{width}_std_{std}.npy")
+    L = np.load(f"{results_dir}/loci_kept_after_localization_round_1_cc_{cc}_lt1_{lt1}_width_{width}_std_{std}.npy")
+    causal_loci = np.where(L==True)[0]
+    Xtrain = np.load(f"{inloc}/geno_train.npy") [:,causal_loci] 
+    Ytrain = np.load(f"{inloc}/pheno_train.npy") 
+    Xtest = np.load(f"{inloc}/geno_test.npy")[:,causal_loci] 
+    Ytest = np.load(f"{inloc}/pheno_test.npy")
+    
+    non_zero_loci = np.where(np.sum(np.abs(F), axis=0))[0]
+    Xtrain = Xtrain[:, non_zero_loci]
+    Xtest = Xtest[:, non_zero_loci]
+    F = F[:, non_zero_loci]
+    causal_loci = causal_loci[non_zero_loci]
+
+
+    
+    envs=["ynb","suloc","raff","mol","27C","eth","30C","25C","sds","cu","33C","li","gu","23C","35C","mann","37C", "4NQO"]
+    envs= sorted(envs)
+    
+    # intialize factorizer for data and rotated objects
+    label = "BBQ"
+    fcts = {}
+
+    # intial factorizer with F
+    fct = factorizer()
+    fct.subtract_means = False
+    fct.init_with_F_XY(F, Xtrain, Ytrain, Xtest, Ytest)
+    fct.loci_names = causal_loci
+    fct.env_names = envs
+    fcts[(label, None, None)] = fct
+
+    # intial factorizer with rotated Fs
+    init_fct_for_rotated_Fs(fcts, label, of_seeds, fo_seeds)
+
+    # pick k 
+    K = 8
+    print(f"will run method with k = {K}")
+
+    # decompose Fs and rotated Fs
+    run_factorizer(fcts, lamb1_range, lamb2_range, lamb1_fixed, lamb2_fixed, K, svd_ks = None, printout = True)
+
+    # save results as a pickle
+    pickle.dump(fcts, open(f"{out_location}/{label}", "wb"))
 
 # ## Kinsler
-
-# In[16]:
 
 if mode == 'kinsler':
     od = pd.read_csv("data/elife-61271-fig2-data1-v2.csv", sep = ',') 
@@ -401,9 +379,6 @@ if mode == 'kinsler':
 
 
 
-    # In[17]:
-
-
     # intialize factorizer for data and rotated objects
     label = "kinsler"
     fcts = {}
@@ -432,17 +407,12 @@ if mode == 'kinsler':
 
 # ## Genotoxin
 
-# In[18]:
 if mode == "genotoxin":
 
 
     od = pd.read_csv("data/genotoxic_input.tsv", sep = '\t') # downloaded from https://figshare.com/articles/dataset/Webster_Supplemental_Output/14963561
     od = od.set_index("Treatment")
     F = od.values
-
-
-    # In[19]:
-
 
     # intialize factorizer for data and rotated objects
     label = "genotoxin"
@@ -490,9 +460,6 @@ if mode == "hiphop":
             envs += [list(od.keys())[1+e]]
 
 
-    # In[ ]:
-
-
     # intialize factorizer for data and rotated objects
     label = "hiphop"
     fcts = {}
@@ -517,9 +484,4 @@ if mode == "hiphop":
 
     # save results as a pickle
     pickle.dump(fcts, open(f"{out_location}/{label}", "wb"))
-
-
-    # In[ ]:
-
-
 
