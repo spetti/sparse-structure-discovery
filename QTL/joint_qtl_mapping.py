@@ -179,7 +179,7 @@ if args.sl2o == False and args.sl1o== False:
     Yval = np.copy(PV)
     if args.v: print("running glmnet round 2")
     F, preds = mlg.get_coefs(Xtrain,Ytrain,Xval,Yval)
-     np.save(open(args.output_prefix+f"/second_F_cc_{args.ct}_lt1_{args.lt1}_width_{args.width}_std_{args.std}_norm_{args.norm}.npy", 'wb'), F)
+    np.save(open(args.output_prefix+f"/second_F_cc_{args.ct}_lt1_{args.lt1}_width_{args.width}_std_{args.std}_norm_{args.norm}.npy", 'wb'), F)
     np.save(open(args.output_prefix+f"/second_preds_cc_{args.ct}_lt1_{args.lt1}_width_{args.width}_std_{args.std}_norm_{args.norm}.npy", 'wb'), preds)
     if args.v: print(f"second glmnet run finished and results saved at {args.output_prefix}/second_F_cc_{args.ct}_lt1_{args.lt1}_width_{args.width}_std_{args.std}.npy")
  
