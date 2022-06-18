@@ -168,7 +168,6 @@ if args.sl2o==False:
             
     if args.v: 
         print(f"num of loci identified: {sum(loci_to_keep)}")
-    print("test")
     np.save(open(args.output_prefix+f"/loci_kept_after_localization_round_1_cc_{args.ct}_lt1_{args.lt1}_width_{args.width}_std_{args.std}_norm_{args.norm}.npy", 'wb'), loci_to_keep)
 
         
@@ -180,21 +179,14 @@ if args.sl2o == False and args.sl1o== False:
     Yval = np.copy(PV)
     if args.v: print("running glmnet round 2")
     F, preds = mlg.get_coefs(Xtrain,Ytrain,Xval,Yval)
-    print("R2 time!")
-    for _ in range(Ytrain.shape[1]):
-        print(r2_score(Ytrain[:,_], preds[:,_]))
-    np.save(open(args.output_prefix+f"/second_F_cc_{args.ct}_lt1_{args.lt1}_width_{args.width}_std_{args.std}_norm_{args.norm}.npy", 'wb'), F)
+     np.save(open(args.output_prefix+f"/second_F_cc_{args.ct}_lt1_{args.lt1}_width_{args.width}_std_{args.std}_norm_{args.norm}.npy", 'wb'), F)
     np.save(open(args.output_prefix+f"/second_preds_cc_{args.ct}_lt1_{args.lt1}_width_{args.width}_std_{args.std}_norm_{args.norm}.npy", 'wb'), preds)
     if args.v: print(f"second glmnet run finished and results saved at {args.output_prefix}/second_F_cc_{args.ct}_lt1_{args.lt1}_width_{args.width}_std_{args.std}.npy")
-    np.save(open(args.output_prefix+"/ytrain.npy","wb"), Ytrain)
-    np.save(open(args.output_prefix+"/F.npy","wb"),F)
-    np.save(open(args.output_prefix+"/preds","wb"),preds)
-    exit()
+ 
+
 
 # run second round of localization
 if args.v: print("running localization round 2")
-print(F.shape)
-print(args.lt2)
 computed_preds = Xtrain @ F.T
 affine_term = (preds-computed_preds)[0,...]
 idx_filt, loci_filt, F_ori, X, Y, Ysub, loci = lc.prep_arrays(F,np.copy(GT), np.copy(PT), loci_to_keep, args.lt2, args.v, affine_term, norm = args.norm)
