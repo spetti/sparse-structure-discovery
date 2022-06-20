@@ -23,7 +23,7 @@ python scripts
 
     Example usage for running the whole pipeline:
     
-    python joint_qtl_mapping.py -gt <inloc/geno_train.npy> -pt <inloc/pheno_train.npy> -gv <inloc/geno_val.npy> -pv <inloc/pheno_val.npy> -c <inloc}/cc_data_all.npy> -output <outloc> -v"
+    python joint_qtl_mapping.py -gt <inloc/geno_train.npy> -pt <inloc/pheno_train.npy> -gv <inloc/geno_val.npy> -pv <inloc/pheno_val.npy> -c <inloc/cc_data_all.npy> -output <outloc> -v"
     
     Options to only perform part of pipeline:
     (Since runs of glmnet can be time intensive, we recommend these options for trying different parameters in steps 1,3,5 )

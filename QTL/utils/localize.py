@@ -4,15 +4,22 @@ import scipy
 import sys
 
 #subtract residuals of top loci (those with effect size at least thresh in some env)
-def prep_arrays(F, X, Y, loci, thresh, verbose):
+def prep_arrays(F, X, Y, loci, thresh, verbose, affine_term, norm = "l1"):
     F_ori = F
     loci = np.array([e for e, i in enumerate(loci) if i])
-    loci_sorted = np.argsort(-np.max(np.abs(F_ori),axis=0))
-    numloci = np.sum(np.max(np.abs(F_ori),axis=0) > thresh)
-    if verbose: print(f"subtracting out effects of {numloci} loci with effect size greater than {thresh} in some env")
+    if norm == "l1":
+        loci_sorted = np.argsort(-np.max(np.abs(F_ori),axis=0))
+        numloci = np.sum(np.max(np.abs(F_ori),axis=0) > thresh)
+        if verbose: print(f"subtracting out effects of {numloci} loci with effect size greater than {thresh} in some env")
+    if norm == "l2":
+        loci_sorted = np.argsort(-np.mean(F_ori**2,axis=0))
+        numloci = np.sum(np.sqrt(np.sum(F_ori**2,axis=0)) > thresh)
+        if verbose: print(f"subtracting out effects of {numloci} loci with l2 norm > {thresh} ")
     idx_filt = loci_sorted[:numloci]
     loci_filt = loci[idx_filt]
-    Y -= np.nanmean(Y,axis=0)
+    if affine_term is not None:
+        Y -= np.nanmean(Y,axis=0)
+    else: Y-=affine_term
     Ysub = X[:,loci_filt]@F_ori[:,idx_filt].T
     
     return idx_filt, loci_filt, F_ori, X, Y, Ysub, loci

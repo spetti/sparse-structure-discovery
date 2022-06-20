@@ -3,15 +3,21 @@ import subprocess
 import os
 from subprocess import call
 
-out_location = "pickled_factorizers_6_15"
+#out_location = "pickled_factorizers_6_15"
+outloc = "pickled_factorizers_6_19"
+try:
+    os.mkdir(outloc)
+except:
+    print(f"directory {outloc} exists")
 
-for mode in ["bbq"]: #, "syn_hub","bbq", "kinsler", "genotoxin"]:
+
+for mode in ["bbq", "bbq8"]: #, "syn_hub","bbq", "kinsler", "genotoxin"]:
     ext = f"{mode}"
     batchfileName = f"/tmp/{ext}"
     batchfile = open(batchfileName, "w")
     batchfile.write("#!/bin/bash \n")
     batchfile.write("#SBATCH -c 4 \n")
-    batchfile.write("#SBATCH -t 2-00:00 \n")
+    batchfile.write("#SBATCH -t 4:00:00 \n")
     batchfile.write("#SBATCH -p eddy \n")
     batchfile.write("#SBATCH --mem=16000 \n")
     batchfile.write(f"#SBATCH -o ./slurm/out.{ext} \n")
@@ -24,7 +30,7 @@ for mode in ["bbq"]: #, "syn_hub","bbq", "kinsler", "genotoxin"]:
     batchfile.write("source activate jupyter_3.6")
     batchfile.write("\n")
 
-    commandstring=f"python factorizer_examples.py {mode} {out_location}"
+    commandstring=f"python factorizer_examples.py {mode} {outloc}"
 
     batchfile.write(commandstring)
     batchfile.write("\n")

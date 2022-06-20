@@ -224,15 +224,16 @@ if mode == "syn_hub":
 # In[5]:
 if mode == 'bbq':
 
-    results_dir = "../QTL/BBQ_results_6_14_lt1_0"
+    results_dir = "../QTL/BBQ_results_6_18"
     inloc = "../QTL/BBQ_data_processed"
-    cc= "0.99"
+    cc= "0.94"
     lt1 ="0.0"
     lt2 = "0.003"
-    width = "50"
+    width = "100"
     std = "2"
-    F = np.load(f"{results_dir}/second_F_cc_{cc}_lt1_{lt1}_width_{width}_std_{std}.npy")
-    L = np.load(f"{results_dir}/loci_kept_after_localization_round_1_cc_{cc}_lt1_{lt1}_width_{width}_std_{std}.npy")
+    norm = "l1"
+    F = np.load(f"{results_dir}/second_F_cc_{cc}_lt1_{lt1}_width_{width}_std_{std}_norm_{norm}.npy")
+    L = np.load(f"{results_dir}/loci_kept_after_localization_round_1_cc_{cc}_lt1_{lt1}_width_{width}_std_{std}_norm_{norm}.npy")
     causal_loci = np.where(L==True)[0]
     Xtrain = np.load(f"{inloc}/geno_train.npy") [:,causal_loci] 
     Ytrain = np.load(f"{inloc}/pheno_train.npy") 
@@ -273,19 +274,20 @@ if mode == 'bbq':
     run_factorizer(fcts, lamb1_range, lamb2_range, lamb1_fixed, lamb2_fixed, K, svd_ks = None, printout = True)
 
     # save results as a pickle
-    pickle.dump(fcts, open(f"{out_location}/{label}", "wb"))
+    pickle.dump(fcts, open(f"{out_location}/{mode}", "wb"))
     
 if mode == 'bbq8':
 
-    results_dir = "../QTL/BBQ_results_6_14_lt1_0"
+    results_dir = "../QTL/BBQ_results_6_18"
     inloc = "../QTL/BBQ_data_processed"
-    cc= "0.99"
+    cc= "0.94"
     lt1 ="0.0"
     lt2 = "0.003"
-    width = "50"
+    width = "100"
     std = "2"
-    F = np.load(f"{results_dir}/second_F_cc_{cc}_lt1_{lt1}_width_{width}_std_{std}.npy")
-    L = np.load(f"{results_dir}/loci_kept_after_localization_round_1_cc_{cc}_lt1_{lt1}_width_{width}_std_{std}.npy")
+    norm = "l1"
+    F = np.load(f"{results_dir}/second_F_cc_{cc}_lt1_{lt1}_width_{width}_std_{std}_norm_{norm}.npy")
+    L = np.load(f"{results_dir}/loci_kept_after_localization_round_1_cc_{cc}_lt1_{lt1}_width_{width}_std_{std}_norm_{norm}.npy")
     causal_loci = np.where(L==True)[0]
     Xtrain = np.load(f"{inloc}/geno_train.npy") [:,causal_loci] 
     Ytrain = np.load(f"{inloc}/pheno_train.npy") 
@@ -326,7 +328,7 @@ if mode == 'bbq8':
     run_factorizer(fcts, lamb1_range, lamb2_range, lamb1_fixed, lamb2_fixed, K, svd_ks = None, printout = True)
 
     # save results as a pickle
-    pickle.dump(fcts, open(f"{out_location}/{label}", "wb"))
+    pickle.dump(fcts, open(f"{out_location}/{mode}", "wb"))
 
 # ## Kinsler
 
