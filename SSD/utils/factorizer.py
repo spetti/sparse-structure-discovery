@@ -561,10 +561,11 @@ def plot_Ms(
     axis.tick_params(labelsize=labelsize)
     axis.set_xticks(np.arange(numl))
     axis.set_yticks(np.arange(M.shape[0]))
+    axis.set_yticklabels(np.arange(M.shape[0])+1)
     axis.set_xticklabels(l_names[:numl], rotation=90)
     [t.set_color(colorlabels[i]) for i, t in enumerate(axis.xaxis.get_ticklabels())]
     axis.set_xlabel(xlabel,fontsize = labelsize*1.2)
-    axis.set_ylabel("Modules",fontsize = labelsize*1.2)
+    axis.set_ylabel("Processes",fontsize = labelsize*1.2)
     for sp in ["top", "bottom", "left", "right"]:
         axis.spines[sp].set_linewidth(1.25)
     if save_name is not None:
@@ -576,19 +577,21 @@ def plot_Ms(
 
     if two_line:
         fig, axis = plt.subplots(1, 1, figsize=(24, 6))
-        im = axis.imshow(
-            np.abs(M[:, numl : 2 * numl - 1]), cmap="Greys", vmin=0, vmax=mm
-        )
+        im = axis.imshow(M[:, numl:2*numl-1], cmap="RdBu", vmin=-mm, vmax=mm)
+        #im = axis.imshow(
+        #    np.abs(M[:, numl : 2 * numl - 1]), cmap="Greys", vmin=0, vmax=mm
+        #)
         axis.tick_params(labelsize=labelsize)
         axis.set_xticks(np.arange(len(l_names[numl : 2 * numl - 1])))
         axis.set_yticks(np.arange(M.shape[0]))
+        axis.set_yticklabels(np.arange(M.shape[0])+1)
         axis.set_xticklabels(l_names[numl : 2 * numl - 1], rotation=90)
         [
             t.set_color(colorlabels[i + numl])
             for i, t in enumerate(axis.xaxis.get_ticklabels())
         ]
         axis.set_xlabel("Loci",fontsize = labelsize*1.2)
-        axis.set_ylabel("Modules",fontsize = labelsize*1.2)
+        axis.set_ylabel("Processes",fontsize = labelsize*1.2)
         for sp in ["top", "bottom", "left", "right"]:
             axis.spines[sp].set_linewidth(1.25)
         if save_name is not None:
@@ -597,7 +600,7 @@ def plot_Ms(
         plt.show()
 
 
-def plot_Ws(fct, params, labelsize = 15, pp = 95, max_rows = 100, colorbar_aspect = [1.02,0.0,0.015,1], T = None, save_name = None):
+def plot_Ws(fct, params, labelsize = 15, pp = 95, max_rows = 100, colorbar_aspect = [1.02,0.0,0.015,1], T = None, save_name = None, ordering = None):
     print("W: plot\n")
     if fct.env_names is None:
         envs = [f"E{_}" for _ in range(fct.FF.shape[0])]
@@ -608,6 +611,11 @@ def plot_Ws(fct, params, labelsize = 15, pp = 95, max_rows = 100, colorbar_aspec
 
     if T is not None and T.shape[0] == W.shape[0]:
         W = deepcopy(T)
+
+    if ordering is not None:
+        W = W[ordering]
+        envs = [envs[ordering[e]] for e in range(len(ordering))]
+
     nume = min(W.shape[0],max_rows)
     sort_c = np.argsort(-np.sum(W**4,axis=0))
     fig,axis = plt.subplots(1,1,figsize = (14,5))
@@ -620,8 +628,10 @@ def plot_Ws(fct, params, labelsize = 15, pp = 95, max_rows = 100, colorbar_aspec
     axis.set_xticks(np.arange(nume))
     axis.tick_params(labelsize = labelsize)
     axis.set_xticklabels(envs[:nume],rotation=90)
+    axis.set_yticks(np.arange(W.shape[1]))
+    axis.set_yticklabels(np.arange(W.shape[1])+1)
     axis.set_xlabel("Environments",fontsize = labelsize*1.25)
-    axis.set_ylabel("Modules",fontsize = labelsize*1.25)
+    axis.set_ylabel("Processes",fontsize = labelsize*1.25)
     for sp in ['top','bottom','left','right']:
         axis.spines[sp].set_linewidth(1.25)
     fig.tight_layout()
@@ -996,7 +1006,7 @@ def plot_rotation_test(
 
     if rotate == "loci":
         rotate = "FO"
-        xlabel = "Ave. modules per locus"
+        xlabel = "Ave. Proc./Locus"
         title = "Loci rotation test"
         legend_label = "F after loci rotated"
         if len(lamb1s) != 1:
@@ -1004,8 +1014,8 @@ def plot_rotation_test(
 
     if rotate == "env":
         rotate = "OF"
-        xlabel = "Ave. modules per trait"
-        title = "Trait rotation test"
+        xlabel = "Ave. Proc./Phenotype"
+        title = "Phenotype rotation test"
         legend_label = "F after traits rotated"
         if len(lamb2s) != 1:
             raise ValueError(" can only have one value of lamb2 for FO test")
@@ -1110,7 +1120,7 @@ def plot_rotation_test_w_error(
 
     if rotate == "loci":
         rotate = "FO"
-        xlabel = "Ave. modules / locus"
+        xlabel = "Ave. Proc./Locus"
         title = "Loci rotation test"
         legend_label = "F after loci rotated"
         if len(lamb1s) != 1:
@@ -1118,8 +1128,8 @@ def plot_rotation_test_w_error(
 
     if rotate == "env":
         rotate = "OF"
-        xlabel = "Ave. modules / trait"
-        title = "Trait rotation test"
+        xlabel = "Ave. Proc./Phenotype"
+        title = "Phenotype rotation test"
         legend_label = "F after traits rotated"
         if len(lamb2s) != 1:
             raise ValueError(" can only have one value of lamb2 for FO test")
@@ -1215,9 +1225,9 @@ def plot_rotation_test_w_error(
         axis.set_ylabel("Reconstruction error", fontsize=fs)
         axis.set_xlabel(xlabel, fontsize=fs)
         axis.set_title(title, fontsize=fs)
-    else:
-        axis.set_xticklabels([])
-        axis.set_yticklabels([])
+    # else:
+    #     axis.set_xticklabels([])
+    #     axis.set_yticklabels([])
     if legend:
         axis.legend(fontsize=fs)
 
@@ -1250,8 +1260,8 @@ def plot_solution_space(
     legend=True,
 ):
 
-    xlabel = r"Ave. Modules / Locus"
-    ylabel = r"Ave. Modules / Trait"
+    xlabel = r"Ave. Processes/Locus"
+    ylabel = r"Ave. Processes/Phenotype"
     plt.close("all")
     ylen = 8
     xlen = (maxx - minx) / (maxy - miny) * ylen
@@ -1347,7 +1357,7 @@ def plot_solution_space(
         arr = np.linspace(vmin, vmax, 10)
         yticklabels = ["%.2f"%a for a in arr]
         cb.ax.set_yticklabels(yticklabels)
-        cb.ax.set_ylabel("Reconstruction error", fontsize=fs)
+        cb.ax.set_ylabel("Reconstruction error", fontsize=fs,labelpad = 20)
 
     keffs = []
     if circled_points is not None:
@@ -1396,7 +1406,7 @@ def plot_solution_space(
         axis.set_xticklabels([])
         axis.set_yticklabels([])
     for sp in ['top','bottom','left','right']:
-        axis.spines[sp].set_linewidth(1.5)
+        axis.spines[sp].set_linewidth(2)
     axis.grid(linewidth = 2)
     #axis.set_title("SSD Solution Space", fontsize = 22)
     axis.set_aspect("equal")
