@@ -4,6 +4,7 @@ utils
 - call_glmnet.py: python wrapper to call glmnet
 - glmnet_fns.R: R code to call glmnet
 - localize.py: localization code
+- get_orf.py: code that maps from SNP position to ORF for BBQ data, written by Eliot Fenton
 
 jupyter notebooks
 - process_BBQ_data.ipynb: designed to process BBQ genotype and phenotype data to form compatible with joint_qtl_mapping.py by
@@ -15,11 +16,17 @@ jupyter notebooks
     
 python scripts
 - joint_qtl_mapping.py: performs all or part of the 5 step localization + optimization pipeline
+
     (1) greedy prefiltering: chooses a subset of loci to include so that no pair of loci is more than -ct correlated
+    
     (2) glmnet round 1: runs glmnet on above subset of loci
+    
     (3) localization round 1: for each loci with effect size > -lt1 in glmnet round 1 results, replace with more confident set of loci
+    
     (4) glmnet round 2: runs glmnet on higher confidence set of loci
+    
     (5) localization round 2: for each loci with effect size > -lt2 in glmnet round 2 results, find confidence interval across phenotypes
+    
 
     Example usage for running the whole pipeline:
     
