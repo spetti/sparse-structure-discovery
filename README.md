@@ -2,8 +2,9 @@
 
 Structure of Repo
 
-QTL: Multi-phenotype QTL mapping 
-See README in folder for further description
+QTL: Multi-phenotype QTL mapping.
+
+This folder contains joint_qtl_mapping.py, which executes our joint QTL mapping pipeline. Code in this folder recreates the QTL mapping on the BBQ dataset. See README in folder for further description. 
 
 SSD
 1. Utils folder
