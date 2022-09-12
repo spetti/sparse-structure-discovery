@@ -12,7 +12,7 @@ jupyter notebooks
     - seperating genotype and phenotypes into training/val/test sets (80/10/10)
     - computing the correlation of nearby loci (using training set only)
     
-- ci_to_orfs_and_annotations.ipynb: (TODO: test- for now just copy and pasted code) given confidence intervals, determines what orfs may be present and compiles annotation data frame
+- ci_to_orfs_and_annotations.ipynb: given confidence intervals, determines what orfs may be present and compiles annotation data frame
     
 python scripts
 - joint_qtl_mapping.py: performs all or part of the 5 step localization + optimization pipeline
