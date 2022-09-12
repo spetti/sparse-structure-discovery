@@ -2,12 +2,8 @@
 
 Structure of Repo
 
-Multi-phenotype QTL mapping 
-1. Utils folder
-  - things that call glmnet 
-  - a file that has localization related functions
-2. python to run GLMNET and localization (will call functions that live in Utils folder)
-3. Script that applies this to BBQ
+QTL: Multi-phenotype QTL mapping 
+See README in folder for further description
 
 SSD
 1. Utils folder
