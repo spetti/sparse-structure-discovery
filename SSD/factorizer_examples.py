@@ -2,7 +2,6 @@
 # coding: utf-8
 
 import numpy as np
-import matplotlib.pyplot as plt
 import sys
 import pickle
 sys.path.insert(0, 'utils/')
@@ -107,6 +106,7 @@ if mode == 'syn_ind':
     E,L,K = 96,200, 6
 
     mw_pairs = []
+    #to run the factorizer on different levels of sparsity
     #for m in [0.2, 0.4, 0.6, 0.8]:
     #    mw_pairs.append((m, 1.0))
     #for w in [0.2, 0.4, 0.6, 0.8]:
@@ -383,6 +383,109 @@ if mode == 'kinsler':
 
     # intialize factorizer for data and rotated objects
     label = "kinsler"
+    fcts = {}
+
+    # intial factorizer with F
+    fct = factorizer()
+    fct.subtract_means = False
+    fct.init_with_F(F)
+    fct.env_names = env_names
+    fct.loci_names = loci_types
+    fcts[(label, None, None)] = fct
+
+    # intial factorizer with rotated Fs
+    init_fct_for_rotated_Fs(fcts, label, of_seeds, fo_seeds)
+
+    # pick k 
+    K = pick_k(fcts[(label, None, None)].FF, printout = False)
+    print(f"will run method with k = {K}")
+
+    # decompose Fs and rotated Fs
+    run_factorizer(fcts, lamb1_range, lamb2_range, lamb1_fixed, lamb2_fixed, K, svd_ks = None, printout = True)
+
+    # save results as a pickle
+    pickle.dump(fcts, open(f"{out_location}/{label}", "wb"))
+
+if mode == 'kinsler_red': #kinsler with fewer diploids
+    od = pd.read_csv("data/elife-61271-fig2-data1-v2.csv", sep = ',') 
+
+    fitness_keys = od.keys()[7::2]
+    error_keys = od.keys()[8::2]
+
+    env_names = list(fitness_keys)
+    env_names = [e[:-8] for e in env_names]
+
+    E = len(env_names)
+
+    #filter unsequenced mutations
+    ECmean_thr = 0.05
+    error_thr = 0.5
+    filtered = []
+    for l,t in enumerate(od['type']):
+        F_ECs = np.zeros(8)
+        for e in range(8):
+            F_ECs[e] = od[fitness_keys[e]][l]
+        #print("%.3f  %.3f" %(np.mean(F_ECs)))
+
+        F_errors = np.zeros(E)
+        for e in range(E):
+            F_errors[e] = od[error_keys[e]][l]
+        #print("%.3f   %.3f" %(np.mean(F_errors), np.max(F_errors)))
+
+        if t == "NotSequenced" or abs(np.mean(F_ECs)) < ECmean_thr or np.max(F_errors) > error_thr:
+            filtered += [False]
+        else:
+            filtered += [True]
+
+    L = np.sum(filtered)
+
+    sorted_ = np.array(np.argsort(od['mutation_type'][filtered]),dtype=int)
+
+    print(E,L,env_names)
+
+    F = np.zeros((E,L))
+    Ferrs = np.zeros((E,L))
+
+    for e in range(len(fitness_keys)):
+        F[e] = np.array(od[fitness_keys[e]][filtered])[sorted_]
+        Ferrs[e] = np.array(od[error_keys[e]][filtered])[sorted_]
+
+    types_filt = [o for i,o in enumerate(list(od['mutation_type'])) if filtered[i]]
+    loci_types = [types_filt[i] for i in sorted_]
+
+    loci_types_unique = []
+    for i in range(1,len(loci_types)):
+        if loci_types[i-1] != loci_types[i]:
+            loci_types_unique += [loci_types[i-1]]
+    loci_types_unique += [loci_types[-1]]
+
+    types_filt = [o for i,o in enumerate(list(od['mutation_type'])) if filtered[i]]
+    loci_types = [types_filt[i] for i in sorted_]
+
+    num_per_type = np.array([sum([True for i in range(len(loci_types))\
+                              if loci_types[i] == name]) for name in loci_types_unique])
+    num_in_test = np.array([0,168,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]) #remove 168 diploids
+    num_in_train = num_per_type - num_in_test
+
+    choices = []
+    for l,name in enumerate(loci_types_unique):
+        indices_of_type = [i for i in range(len(loci_types)) if loci_types[i] == name]
+        choice = list(np.random.choice(indices_of_type, size = num_in_train[l],replace = False))
+        choices += choice
+        #print(name,choice)
+
+    lfilt = np.zeros(len(loci_types), dtype = bool)
+    lfilt[choices] = True
+
+    F = F[:,lfilt]
+    loci_types = [l for i,l in enumerate(loci_types) if lfilt[i]]
+
+
+    # In[17]:
+
+
+    # intialize factorizer for data and rotated objects
+    label = "kinsler_red"
     fcts = {}
 
     # intial factorizer with F
