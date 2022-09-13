@@ -5,8 +5,8 @@ import time
 
 pos = np.array(sys.argv[1:]).astype('int')
 
-snp_file = '/n/desai_lab/users/efenton/bbq/yeast_info/BYxRM_nanopore_SNPs.txt'
-genes_file = '/n/desai_lab/users/efenton/bbq/yeast_info/BY4742_sorted_annotations.gff3'
+snp_file = './BBQ_results/BYxRM_nanopore_SNPs.txt'
+genes_file = './BBQ_results/BY4742_sorted_annotations.gff3'
 
 with open(snp_file) as sf:
     for line in sf:
