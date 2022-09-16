@@ -8,14 +8,12 @@ pip install -r requirements.txt
 
 Structure of repository
 
-SSD (Sparse Structure Discovery)
+SSD: Sparse Structure Discovery
 
 1. Tutorial Jupyter notebook
 2. Python script that generates factorizer objects for the data analyzed in the paper
 3. Notebooks generating the figures presented in the paper
-4. Utils folder
-- factorizer.py
-- ssd.py
+4. Utils folder containing code that executes our ssd method (ssd.py) and stores solutions across a range of regularization values (factorizer.py)
 
 QTL: Multi-phenotype QTL mapping.
 
