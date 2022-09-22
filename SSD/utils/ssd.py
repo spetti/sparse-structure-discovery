@@ -38,7 +38,7 @@ M_lb=1e-3, W_lb = 1e-3,  fit_intercept = False): #add "all" option by default
 
     to_return = None
     if verbose:
-        print("K    lamb1    lamb2   error_ours  error_svd   Keff   av.proc./loci   av.proc./env   loci dropped    grassmann to svd")
+        print("Kmax    lambW    lambM   error_ours  error_svd   K   av.proc./loci   av.proc./env   loci dropped    grassmann to svd")
     our_errs = []
     mods = []
     ndls = []
