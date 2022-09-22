@@ -12,7 +12,7 @@ Structure of repository
 
 SSD: Sparse Structure Discovery
 
-1. Tutorial Jupyter notebook (coming soon)
+1. Tutorial Jupyter notebook (SSD/Example\ notebook.ipynb)
 2. Python script that generates factorizer objects for the data analyzed in the paper (factorizer_examples.py)
 3. Notebooks generating the figures presented in the paper ({bbq, genotoxin, hub_synthetic, independent_synthetic, kinsler}_figures.ipynb)
 4. Utils folder containing code that executes our ssd method (ssd.py) and stores solutions across a range of regularization values (factorizer.py)
