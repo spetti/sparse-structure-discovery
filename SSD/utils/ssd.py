@@ -38,7 +38,7 @@ M_lb=1e-3, W_lb = 1e-3,  fit_intercept = False): #add "all" option by default
 
     to_return = None
     if verbose:
-        print("K    lamb1    lamb2   error_ours  error_svd   Keff   av.mod./loci   av.mod./env   loci dropped    grassmann to svd")
+        print("K    lamb1    lamb2   error_ours  error_svd   Keff   av.proc./loci   av.proc./env   loci dropped    grassmann to svd")
     our_errs = []
     mods = []
     ndls = []
@@ -607,15 +607,15 @@ def plot_tradeoffs(atts, atts_rot, kmin, kmax, ks=None, title = None):
         #plt.scatter(restricted_atts_rot[k]["ave modules / loci"], restricted_atts_rot[k]["error"])
         #plt.title(f"k={k}")
         #plt.show()
-        if len(restricted_atts_rot[k]["ave modules / loci"])>0:
-            mn = min(restricted_atts_rot[k]["ave modules / loci"])
-            mx = max(restricted_atts_rot[k]["ave modules / loci"])
+        if len(restricted_atts_rot[k]["ave processes / loci"])>0:
+            mn = min(restricted_atts_rot[k]["ave processes / loci"])
+            mx = max(restricted_atts_rot[k]["ave processes / loci"])
         else:
             mn = 0
             mx = 0
-        f = interpolate.interp1d(restricted_atts_rot[k]["ave modules / loci"], restricted_atts_rot[k]["error"])
+        f = interpolate.interp1d(restricted_atts_rot[k]["ave processes / loci"], restricted_atts_rot[k]["error"])
         restricted_atts[k]["FO err / F err"] = []
-        for _,aml in enumerate(restricted_atts[k]["ave modules / loci"]):
+        for _,aml in enumerate(restricted_atts[k]["ave processes / loci"]):
             if aml < mn or aml > mx:
                 restricted_atts[k]["FO err / F err"].append(-1)
             else:
@@ -637,18 +637,18 @@ def plot_tradeoffs(atts, atts_rot, kmin, kmax, ks=None, title = None):
         for n, val in enumerate(restricted_atts[k]["FO err / F err"]):
             if val > 0:
                 x1s.append(restricted_atts[k]["error"][n])
-                y1s.append(restricted_atts[k]["ave modules / loci"][n])
+                y1s.append(restricted_atts[k]["ave processes / loci"][n])
                 c1s.append(restricted_atts[k]["FO err / F err"][n])
             else:
                 x2s.append(restricted_atts[k]["error"][n])
-                y2s.append(restricted_atts[k]["ave modules / loci"][n])  
-        plt.plot(restricted_atts[k]["error"],restricted_atts[k]["ave modules / loci"], label = f"k = {k}", c = 'black', alpha = .8-.8*((k-kmin) / (kmax-kmin + 1)))
+                y2s.append(restricted_atts[k]["ave processes / loci"][n])  
+        plt.plot(restricted_atts[k]["error"],restricted_atts[k]["ave processes / loci"], label = f"k = {k}", c = 'black', alpha = .8-.8*((k-kmin) / (kmax-kmin + 1)))
         plt.scatter(x2s, y2s, marker = 'd', c= 'black')
         plt.scatter(x1s,y1s, c = c1s, vmin = mn, vmax =mx, cmap = 'viridis_r')
 
 
     plt.xlabel("error", fontsize = fontsize)
-    plt.ylabel("ave modules / loci", fontsize = fontsize)
+    plt.ylabel("ave processes / loci", fontsize = fontsize)
     cbar = plt.colorbar()
     cbar.set_label("FO error / F error")
     plt.legend()
