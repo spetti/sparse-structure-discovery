@@ -174,7 +174,7 @@ class factorizer:
         )
         if self.init_mode == "MW" and verbose:
             print(
-                f"True ave mod / loci: {self.true_ampl:.2f}, True ave mod / env: {self.true_ampe:.2f}"
+                f"True ave proc / loci: {self.true_ampl:.2f}, True ave proc / env: {self.true_ampe:.2f}"
             )
         for i, lamb1 in enumerate(lamb1s):
             for j, lamb2 in enumerate(lamb2s):
@@ -855,7 +855,7 @@ def plot_error_v_mod_lamb2_range(
     fig, axis = plt.subplots(1, 1, figsize=(4.5, 4.5))
     plt.scatter(x_mods, y_error_left, c="C0")
     if ave:
-        axis.set_xlabel(f"ave mod/loci", fontsize=18)
+        axis.set_xlabel(f"ave proc/loci", fontsize=18)
     else:
         axis.set_xlabel(f"Modularity", fontsize=18)
         axis.set_xlim(0, 1)
